@@ -40,6 +40,8 @@ services:
       SPARK_WORKER_CORES: 2
       SPARK_WORKER_MEMORY: 1g
       SPARK_MASTER_URL: spark://spark-master:7077
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
 
   postgres:
     image: postgres:14.0
@@ -57,6 +59,9 @@ services:
       - "8080:8080"
     depends_on:
       - scheduler
+    environment:
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
 
   scheduler:
     <<: *airflow-common
