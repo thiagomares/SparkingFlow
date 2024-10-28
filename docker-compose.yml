@@ -5,7 +5,7 @@ x-spark-common: &spark-common
   volumes:
     - ./jobs:/opt/bitnami/spark/jobs
   networks:
-    - code-with-yu
+    - spark_flow
 
 x-airflow-common: &airflow-common
   build:
@@ -20,7 +20,7 @@ x-airflow-common: &airflow-common
   depends_on:
     - postgres
   networks:
-    - code-with-yu
+    - spark_flow
 
 services:
   spark-master:
@@ -50,7 +50,7 @@ services:
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
     networks:
-      - code-with-yu
+      - spark_flow
 
   webserver:
     <<: *airflow-common
@@ -65,7 +65,7 @@ services:
 
   scheduler:
     <<: *airflow-common
-    command: bash -c "airflow db migrate && airflow users create --username admin --firstname Yusuf --lastname Ganiyu --role Admin --email airscholar@gmail.com --password admin && airflow scheduler"
+    command: bash -c "airflow db migrate && airflow users create --username admin --firstname Thiago --lastname Mares --role Admin --email thiagfmares@outlook.com --password admin && airflow scheduler"
 
 networks:
-  code-with-yu:
+  spark_flow:
