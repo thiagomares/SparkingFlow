@@ -1,5 +1,6 @@
 version: '3'
 
+# Aqui nos estamos utilizando os itens comuns para o spark
 x-spark-common: &spark-common
   image: bitnami/spark:latest
   volumes:
@@ -7,6 +8,7 @@ x-spark-common: &spark-common
   networks:
     - spark_flow
 
+# e aqui os itens comuns do airflow
 x-airflow-common: &airflow-common
   build:
     context: .
@@ -19,9 +21,11 @@ x-airflow-common: &airflow-common
     - ./logs:/opt/airflow/logs
   depends_on:
     - postgres
+    - mysql
   networks:
     - spark_flow
 
+# Criando os serviços
 services:
   spark-master:
     <<: *spark-common
@@ -52,6 +56,18 @@ services:
     networks:
       - spark_flow
 
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: airflow
+      MYSQL_USER: airflow
+      MYSQL_PASSWORD: airflow_password
+    ports:
+      - "3306:3306"
+    networks:
+      - spark_flow
+
   webserver:
     <<: *airflow-common
     command: webserver
@@ -60,6 +76,7 @@ services:
     depends_on:
       - scheduler
     environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: mysql+pymysql://airflow:airflow_password@mysql:3306/airflow
       PYSPARK_PYTHON: python3
       PYSPARK_DRIVER_PYTHON: python3
 
