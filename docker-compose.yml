@@ -46,6 +46,8 @@ services:
       SPARK_MASTER_URL: spark://spark-master:7077
       PYSPARK_PYTHON: python3
       PYSPARK_DRIVER_PYTHON: python3
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      YARN_CONF_DIR: /opt/hadoop/etc/hadoop
 
   postgres:
     image: postgres:14.0

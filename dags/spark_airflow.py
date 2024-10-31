@@ -25,6 +25,15 @@ python_job = SparkSubmitOperator(
     dag=dag
 )
 
+testando = SparkSubmitOperator(
+    task_id="testando",
+    conn_id="spark-conn",
+    application="jobs/python/coleta_dados.py",
+    packages='mysql:mysql-connector-java:8.0.32',
+    dag=dag
+)
+
+
 scala_job = SparkSubmitOperator(
     task_id="scala_job",
     conn_id="spark-conn",
@@ -47,4 +56,4 @@ end = PythonOperator(
     dag=dag
 )
 
-start >> [python_job, scala_job, java_job] >> end
+start >> [python_job, scala_job, java_job] >> testando >> end 

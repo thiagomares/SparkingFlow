@@ -16,7 +16,8 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 # Alternando para o usuario airflow
 USER airflow
 
+
 # Instalando o Airflow, o spark e a biblioteca do spark para o airflow para que se utilize a lib
-RUN pip install apache-airflow apache-airflow-providers-apache-spark pyspark
+RUN pip install apache-airflow apache-airflow-providers-apache-spark pyspark pymysql
 
 # Optional: Add any additional setup or configurations here

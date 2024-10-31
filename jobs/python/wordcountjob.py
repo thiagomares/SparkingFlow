@@ -13,4 +13,3 @@ for wc in wordCounts.collect():
 
 spark.stop()
 
-
