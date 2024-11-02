@@ -37,8 +37,8 @@ def teste_coleta():
     import boto3
     import os
 
-    AWS_ACCESS_KEY_ID = 'AKIAZI2LDILVXCJPTPHI'
-    AWS_SECRET_ACCESS_KEY = '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'
+    AWS_ACCESS_KEY_ID = 'AKIAZI2LDILVXCJPTPHa'
+    AWS_SECRET_ACCESS_KEY = 'pJ9RDboccCjHZC7fw8evVFGjyZViIKvYKBp1o9hb'
     AWS_REGION = 'sa-east-1' 
 
     bucket_name = 'bucketestudosengdados'
