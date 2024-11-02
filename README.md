@@ -26,5 +26,5 @@ Before setting up the project, ensure you have the following:
 ### Notas:
 Para configurar a comunicação entre o Airflow e Spark e os SGBDs, deve-se configurar as suas respectivas configurações dentro da UI do Airflow. Para os jobs spark, essa configuração não é necessária, podendo assim serem realizadas via código
 
-## Crétditos
+## Créditos
 A estrutura basicia de pastas e os codigos java e scala são de direitos intelectuais de Yusuf Guanyou, sendo este um fork do projeto base.
