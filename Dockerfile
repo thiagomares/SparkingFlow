@@ -18,6 +18,6 @@ USER airflow
 
 
 # Instalando o Airflow, o spark e a biblioteca do spark para o airflow para que se utilize a lib
-RUN pip install apache-airflow apache-airflow-providers-apache-spark pyspark pymysql
+RUN pip install apache-airflow apache-airflow-providers-apache-spark pyspark pymysql apache-airflow-providers-mysql
 
 # Optional: Add any additional setup or configurations here
