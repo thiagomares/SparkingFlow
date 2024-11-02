@@ -1,62 +1,30 @@
-# Apache Airflow on Steroids with Java, Scala and Python Spark Jobs
+# Airflow com Python, Spark, MySQL, Postgres e Docker
 
-This project orchestrates Spark jobs written in different programming languages using Apache Airflow, all within a Dockerized environment. The DAG `sparking_flow` is designed to submit Spark jobs written in Python, Scala, and Java, ensuring that data processing is handled efficiently and reliably on a daily schedule.
+Este projeto tem aintenção de mostrar como algumas tecnologias funcionam orquestradas
 
-## Project Structure
+## Estrutura
 
-The DAG `sparking_flow` includes the following tasks:
+ Neste projeto nos temos duas `dags`, sendo uma em construção, sendo a completa conta com:
 
-- `start`: A PythonOperator that prints "Jobs started".
-- `python_job`: A SparkSubmitOperator that submits a Python Spark job.
-- `scala_job`: A SparkSubmitOperator that submits a Scala Spark job.
-- `java_job`: A SparkSubmitOperator that submits a Java Spark job.
-- `end`: A PythonOperator that prints "Jobs completed successfully".
+- `start`: Um operador python que cria um log em banco de dadoos com informações de quando foi realizado o início.
+- `PythonOperator`: Um operador para rodar algumas rotinas python
+- `python_job`: Este operado lança para o spark-master um job.
+- `MySQL_operator`: operador utilizado para validação de funcionamento do banco
+- `end`:  Um operador python que cria um log em banco de dadoos com informações de fim do ciclo do airflow.
 
-These tasks are executed in a sequence where the `start` task triggers the Spark jobs in parallel, and upon their completion, the `end` task is executed.
 
-## Prerequisites
+
+## Requisitos
 
 Before setting up the project, ensure you have the following:
 
-- Docker and Docker Compose installed on your system.
-- Apache Airflow Docker image or a custom image with Airflow installed.
-- Apache Spark Docker image or a custom image with Spark installed and configured to work with Airflow.
-- Docker volumes for Airflow DAGs, logs, and Spark jobs are properly set up.
+- Docker
+- Imagem do Airflow, Spark, MySQL e Postgres
+- Configurar volumes no docker compose para o Spark Jobs e para as Dags
 
-## Docker Setup
 
-To run this project using Docker, follow these steps:
+### Notas:
+Para configurar a comunicação entre o Airflow e Spark e os SGBDs, deve-se configurar as suas respectivas configurações dentro da UI do Airflow. Para os jobs spark, essa configuração não é necessária, podendo assim serem realizadas via código
 
-1. Clone this repository to your local machine.
-2. Navigate to the directory containing the `docker-compose.yml` file.
-3. Build and run the containers using Docker Compose:
-
-```bash
-docker-compose up -d --build
-```
-This command will start the necessary services defined in your docker-compose.yml, such as Airflow webserver, scheduler, Spark master, and worker containers.
-
-## Directory Structure for Jobs
-Ensure your Spark job files are placed in the following directories and are accessible to the Airflow container:
-
-* Python job: jobs/python/wordcountjob.py
-* Scala job: jobs/scala/target/scala-2.12/word-count_2.12-0.1.jar
-* Java job: jobs/java/spark-job/target/spark-job-1.0-SNAPSHOT.jar
-
-These paths should be relative to the mounted Docker volume for Airflow DAGs.
-
-## Usage
-After the Docker environment is set up, the `sparking_flow` DAG will be available in the Airflow web UI [localhost:8080](localhost:8080), where it can be triggered manually or run on its daily schedule.
-
-### The DAG will execute the following steps:
-* Print "Jobs started" in the Airflow logs.
-* Submit the Python Spark job to the Spark cluster.
-* Submit the Scala Spark job to the Spark cluster.
-* Submit the Java Spark job to the Spark cluster.
-* Print "Jobs completed successfully" in the Airflow logs after all jobs have finished.
-
-### Note:
-You must add the spark cluster url to the spark connection in the configuration on Airflow UI
-
-### Full Course
-[![Sparking Flow](https://img.youtube.com/vi/o_pne3aLW2w/0.jpg)](https://www.youtube.com/watch?v=o_pne3aLW2w)
+## Crétditos
+A estrutura basicia de pastas e os codigos java e scala são de direitos intelectuais de Yusuf Guanyou, sendo este um fork do projeto base.
