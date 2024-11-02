@@ -85,7 +85,5 @@ services:
     <<: *airflow-common
     command: bash -c "airflow db migrate && airflow users create --username admin --firstname Thiago --lastname Mares --role Admin --email thiagfmares@outlook.com --password admin && airflow scheduler"
 
-  
-
 networks:
   spark_flow:
