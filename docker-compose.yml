@@ -1,6 +1,6 @@
 version: '3'
 
-# Aqui nos estamos utilizando os itens comuns para o spark
+# Itens comuns para o Spark
 x-spark-common: &spark-common
   image: bitnami/spark:latest
   volumes:
@@ -8,7 +8,7 @@ x-spark-common: &spark-common
   networks:
     - spark_flow
 
-# e aqui os itens comuns do airflow
+# Itens comuns para o Airflow
 x-airflow-common: &airflow-common
   build:
     context: .
@@ -25,7 +25,6 @@ x-airflow-common: &airflow-common
   networks:
     - spark_flow
 
-# Criando os serviços
 services:
   spark-master:
     <<: *spark-common
@@ -85,6 +84,8 @@ services:
   scheduler:
     <<: *airflow-common
     command: bash -c "airflow db migrate && airflow users create --username admin --firstname Thiago --lastname Mares --role Admin --email thiagfmares@outlook.com --password admin && airflow scheduler"
+
+  
 
 networks:
   spark_flow:
