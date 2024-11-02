@@ -24,7 +24,6 @@ def log_to_db(task_name, status, message, dag_id):
     VALUES ('{task_name}', '{status}', '{message}', '{dag_id}');
     """
     
-    # Usando MySqlOperator para garantir que a operação ocorra dentro do contexto do Airflow
     log_task = MySqlOperator(
         task_id=f'log_{task_name}',
         sql=sql,
@@ -32,8 +31,35 @@ def log_to_db(task_name, status, message, dag_id):
         dag=dag,
     )
     
-    # Executando a tarefa de log
     log_task.execute(context={})
+
+def teste_coleta():
+    import boto3
+    import os
+
+    AWS_ACCESS_KEY_ID = 'AKIAZI2LDILVXCJPTPHI'
+    AWS_SECRET_ACCESS_KEY = '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'
+    AWS_REGION = 'sa-east-1' 
+
+    bucket_name = 'bucketestudosengdados'
+    file_key = 'mes/dia/hora/13/clientes.csv'
+    local_file_path = 'clientes.csv' 
+
+    session = boto3.Session(
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        region_name=AWS_REGION
+    )
+
+    s3 = session.client('s3')
+
+    try:
+        s3.download_file(bucket_name, file_key, local_file_path)
+        print(f"Arquivo {local_file_path} baixado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao baixar o arquivo: {e}")
+
+    os.remove(local_file_path)
 
 def start_job(**kwargs):
     logging.info("Jobs started")
@@ -52,10 +78,9 @@ def log_task_status(task_name):
 
     return log_status
 
-# Criar a tabela de logs se não existir
 criar_tabela_logs = MySqlOperator(
-    task_id='criar_tabela_logs',
-    sql="""
+    task_id='check_status',
+    sql=""" 
     CREATE TABLE IF NOT EXISTS logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         task_name VARCHAR(100),
@@ -68,24 +93,9 @@ criar_tabela_logs = MySqlOperator(
     mysql_conn_id='mysql-conn',
 )
 
-criar_tabela = MySqlOperator(
-    task_id='criar_tabela',
-    sql="""
-    CREATE TABLE IF NOT EXISTS tabela (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(100),
-        idade INT,
-        data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """,
-    mysql_conn_id='mysql-conn',
-    on_success_callback=log_task_status('criar_tabela'),
-    on_failure_callback=log_task_status('criar_tabela'),
-)
-
 cria_backup = MySqlOperator(
     task_id='cria_backup',
-    sql="""
+    sql=""" 
     CREATE TABLE IF NOT EXISTS tabela_backup AS 
     SELECT * FROM tabela WHERE data_criacao < DATE_SUB(NOW(), INTERVAL 1 DAY);
     """,
@@ -101,42 +111,61 @@ start = PythonOperator(
     dag=dag
 )
 
-python_job = SparkSubmitOperator(
-    task_id="python_job",
-    conn_id="spark-conn",
-    application="jobs/python/wordcountjob.py",
-    dag=dag,
-    on_success_callback=log_task_status('python_job'),
-    on_failure_callback=log_task_status('python_job'),
+teste_coletador = PythonOperator(
+    task_id="teste_coleta",  # Renomeado para evitar duplicação
+    python_callable=teste_coleta,
+    provide_context=True,
+    dag=dag
 )
 
-testando = SparkSubmitOperator(
-    task_id="testando",
+tabela_clientes = SparkSubmitOperator(
+    task_id="tabela_clientes",
     conn_id="spark-conn",
-    application="jobs/python/coleta_dados.py",
-    packages='mysql:mysql-connector-java:8.0.32',
+    application="jobs/python/coleta_dados_clientes.py",
+    packages='mysql:mysql-connector-java:8.0.32,com.amazonaws:aws-java-sdk-s3:1.12.200,org.apache.hadoop:hadoop-aws:3.3.1',
     dag=dag,
     on_success_callback=log_task_status('testando'),
     on_failure_callback=log_task_status('testando'),
 )
 
-scala_job = SparkSubmitOperator(
-    task_id="scala_job",
+tabela_vendas = SparkSubmitOperator(
+    task_id="tabela_vendas",
     conn_id="spark-conn",
-    application="jobs/scala/target/scala-2.12/word-count_2.12-0.1.jar",
+    application="jobs/python/coleta_dados_vendas.py",
+    packages='mysql:mysql-connector-java:8.0.32,com.amazonaws:aws-java-sdk-s3:1.12.200,org.apache.hadoop:hadoop-aws:3.3.1',
     dag=dag,
-    on_success_callback=log_task_status('scala_job'),
-    on_failure_callback=log_task_status('scala_job'),
+    on_success_callback=log_task_status('testando'),
+    on_failure_callback=log_task_status('testando'),
 )
 
-java_job = SparkSubmitOperator(
-    task_id="java_job",
+tabela_vendedores = SparkSubmitOperator(
+    task_id="tabela_vendedores",
     conn_id="spark-conn",
-    application="jobs/java/spark-job/target/spark-job-1.0-SNAPSHOT.jar",
-    java_class="com.airscholar.spark.WordCountJob",
+    application="jobs/python/coleta_dados_vendedores.py",
+    packages='mysql:mysql-connector-java:8.0.32,com.amazonaws:aws-java-sdk-s3:1.12.200,org.apache.hadoop:hadoop-aws:3.3.1',
     dag=dag,
-    on_success_callback=log_task_status('java_job'),
-    on_failure_callback=log_task_status('java_job'),
+    on_success_callback=log_task_status('testando'),
+    on_failure_callback=log_task_status('testando'),
+)
+
+tabela_produtos = SparkSubmitOperator(
+    task_id="tabela_produtos",
+    conn_id="spark-conn",
+    application="jobs/python/coleta_dados_produtos.py",
+    packages='mysql:mysql-connector-java:8.0.32,com.amazonaws:aws-java-sdk-s3:1.12.200,org.apache.hadoop:hadoop-aws:3.3.1',
+    dag=dag,
+    on_success_callback=log_task_status('testando'),
+    on_failure_callback=log_task_status('testando'),
+)
+
+tabela_itens = SparkSubmitOperator(
+    task_id="tabela_itens",
+    conn_id="spark-conn",
+    application="jobs/python/coleta_dados_itens_venda.py",
+    packages='mysql:mysql-connector-java:8.0.32,com.amazonaws:aws-java-sdk-s3:1.12.200,org.apache.hadoop:hadoop-aws:3.3.1',
+    dag=dag,
+    on_success_callback=log_task_status('testando'),
+    on_failure_callback=log_task_status('testando'),
 )
 
 end = PythonOperator(
@@ -146,7 +175,6 @@ end = PythonOperator(
     dag=dag,
 )
 
-# Definindo a ordem das tarefas
-start >> criar_tabela_logs >> [criar_tabela, cria_backup]
-criar_tabela >> [python_job, scala_job, java_job] >> testando >> end
-cria_backup >> [python_job, scala_job, java_job] >> testando >> end
+start >> criar_tabela_logs >> [teste_coletador, cria_backup] 
+teste_coletador >> [tabela_clientes, tabela_vendas, tabela_vendedores, tabela_produtos, tabela_itens] >> end
+
