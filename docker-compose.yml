@@ -1,12 +1,10 @@
-version: '3'
-
 # Itens comuns para o Spark
 x-spark-common: &spark-common
   image: bitnami/spark:latest
   volumes:
     - ./jobs:/opt/bitnami/spark/jobs
   networks:
-    - spark_flow
+    - airflow
 
 # Itens comuns para o Airflow
 x-airflow-common: &airflow-common
@@ -23,7 +21,7 @@ x-airflow-common: &airflow-common
     - postgres
     - mysql
   networks:
-    - spark_flow
+    - airflow
 
 services:
   spark-master:
@@ -40,8 +38,8 @@ services:
       - spark-master
     environment:
       SPARK_MODE: worker
-      SPARK_WORKER_CORES: 2
-      SPARK_WORKER_MEMORY: 1g
+      SPARK_WORKER_CORES: 12
+      SPARK_WORKER_MEMORY: 16g
       SPARK_MASTER_URL: spark://spark-master:7077
       PYSPARK_PYTHON: python3
       PYSPARK_DRIVER_PYTHON: python3
@@ -55,7 +53,7 @@ services:
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
     networks:
-      - spark_flow
+      - airflow
 
   mysql:
     image: mysql:8.0
@@ -67,7 +65,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - spark_flow
+      - airflow
 
   webserver:
     <<: *airflow-common
@@ -86,4 +84,4 @@ services:
     command: bash -c "airflow db migrate && airflow users create --username admin --firstname Thiago --lastname Mares --role Admin --email thiagfmares@outlook.com --password admin && airflow scheduler"
 
 networks:
-  spark_flow:
+  airflow:
