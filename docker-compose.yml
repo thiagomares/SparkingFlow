@@ -1,5 +1,4 @@
-version: "3.8"
-
+# coisas para lembrar: Não se usa o version no docker-compose.yml
 # Itens comuns para o Spark
 x-spark-common: &spark-common
   image: bitnami/spark:latest

@@ -20,6 +20,14 @@ dag = DAG(
 def log_to_db(task_name, status, message, dag_id):
     mysql_conn = BaseHook.get_connection('mysql-conn')
     sql = f"""
+    create table if not exists logs (
+        id int auto_increment primary key,
+        task_name varchar(100),
+        status varchar(20),
+        message text,
+        dag_name varchar(100),
+        timestamp timestamp default current_timestamp
+    );
     INSERT INTO logs (task_name, status, message, dag_name)
     VALUES ('{task_name}', '{status}', '{message}', '{dag_id}');
     """
