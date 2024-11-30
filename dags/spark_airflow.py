@@ -37,8 +37,8 @@ def teste_coleta():
     import boto3
     import os
 
-    AWS_ACCESS_KEY_ID = '#AccessKey'
-    AWS_SECRET_ACCESS_KEY = '#accessSecretKey'
+    AWS_ACCESS_KEY_ID = 'AKIAZI2LDILVTCRC5Y5I'
+    AWS_SECRET_ACCESS_KEY = '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'
     AWS_REGION = 'sa-east-1' 
 
     bucket_name = 'bucketestudosengdados'
@@ -59,7 +59,6 @@ def teste_coleta():
     except Exception as e:
         print(f"Erro ao baixar o arquivo: {e}")
 
-    os.remove(local_file_path)
 
 def start_job(**kwargs):
     logging.info("Jobs started")

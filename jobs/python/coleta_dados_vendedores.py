@@ -21,8 +21,8 @@ def collect_and_transfer_data():
         "driver": "com.mysql.cj.jdbc.Driver"
     }
 
-    spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", "AKIAZI2LDILVXCJPTPHI")
-    spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", "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")
+    spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", os.getenv('AWS_ACCESS_KEY_ID'))
+    spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", os.getenv('AWS_SECRET_ACCESS_KEY'))
     spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.sa-east-1.amazonaws.com")
 
     df = spark.read.csv(s3_path, header=True, inferSchema=True, sep=';')
